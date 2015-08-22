@@ -1,0 +1,1 @@
+#this is an attempt to create a ReadMe file for my R repository, to commit to a branch, then to merge that branch.  first I just created the R file, and saving it.  next I will go to git hub to complete the process
