@@ -1,7 +1,6 @@
-#tester
-#server
+
 library(shiny)
-#library(quantmod)
+
 library(ggplot2)
   library(RCurl)
   library(jsonlite)
