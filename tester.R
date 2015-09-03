@@ -6,15 +6,20 @@ library(RCurl)
 library(jsonlite)
 library(plyr)
 source("./openinterest/source/googleInput.R")
-ticker <- "AAPL"
+ticker <- "GOOG"
 inputstrikes <- 20
 doDebug <<- T
+theSize <- 12
+
 googChains <- getOptionChainGoogle(ticker)
 	chains <- mergePutsCalls(googChains)
 	chain <- getOneExpiration(chains)
 	strikes <- getStrikes(chain,inputstrikes)
-	
+	expiry <- googChains[1,"expiry"]
+	selectInputChoices <- googChains[,"expiry"]
+	chain <- getOneExpiration(googChains,expiry)
 		p <- ggplot(chain, aes(x = strike))
+
 		
 	p <- p + geom_area(aes(y = putOI, fill = "1 put", colour = "1 put", stat = "bin"), alpha = 0.5) + geom_area(aes(y = callOI, fill = "2 call", colour = "2 call", stat = "bin"), alpha = 0.5)
 	       

@@ -57,10 +57,11 @@ shinyServer(function(input, output, clientData, session) {
 		print("update")
 	
 	googChains <- reactive({getOptionChainGoogle(input$ticker)})
+	expirations <- reactive({levels(as.factor(googChains()[,"expiry"]))})
 	chains <- reactive({mergePutsCalls(googChains())})
 	chain <- reactive({getOneExpiration(chains(),input$expiry)})
 	strikeData <- reactive({getStrikes(chain(),input$strikes, input$allStrikes)})
-    observe({updateSelectInput(session,"expiry",choices=googChains()[,"expiry"])})
+    observe({updateSelectInput(session,"expiry",choices= expirations())})
      
 			
 output$OIplot <- renderPlot({

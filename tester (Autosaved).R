@@ -16,7 +16,7 @@ googChains <- getOptionChainGoogle(ticker)
 	chain <- getOneExpiration(chains)
 	strikes <- getStrikes(chain,inputstrikes)
 	expiry <- googChains[1,"expiry"]
-	selectInputChoices <- googChains[,"expiry"]
+	selectInputChoices <- levels(as.factor(googChains[,"expiry"]))
 	chain <- getOneExpiration(googChains,expiry)
 		p <- ggplot(chain, aes(x = strike))
 
