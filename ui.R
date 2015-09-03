@@ -6,12 +6,11 @@ fluidRow(
 h3("Option Open Interest"),
     plotOutput("OIplot"),
 	column(4,
-	textInput("ticker","Ticker", value="GOOG")),
+	textInput("ticker","Ticker", value="AAPL")),
 	column(4,
 	checkboxInput("allStrikes","Use all strikes?", value=FALSE),
 	sliderInput("strikes","Strikes:", value=20, min=4, max=maxStrikes)),
 	column(4,
-	#textInput("expiry","expiration yyyy-mm-dd"))
 	 selectInput("expiry", "expiration yyyy-mm-dd",
                     multiple = FALSE,
                     c("")))
