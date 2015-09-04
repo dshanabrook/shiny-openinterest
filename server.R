@@ -17,13 +17,15 @@ mergePutsCalls <- function(googChains) {
 	names(putCall) <- c("expiry", "strike", "putOI", "callOI")
 	return(putCall)
 }
-getOneExpiration <- function(chains, exp = "") {
+getOneExpiration <- function(chains, exp = "",allExpiration=FALSE) {
 	if (doDebug) 
 		print("getOneExpiration")
 	if (exp=="")
 		exp <- chains[1, ]$expiry
-	print(exp)
-	return(chains[(chains$expiry == exp), ])
+	if (!allExpiration){
+		return(chains[(chains$expiry == exp), ])
+	} else {
+		return(chains)}
 }
 
 getStrikes <- function(chain, strikesWanted, allStrikes=FALSE) {
@@ -53,7 +55,8 @@ shinyServer(function(input, output, clientData, session) {
 	))
 	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
 	chains <- reactive(mergePutsCalls(googChains()))
-	chain <- reactive(getOneExpiration(chains(),input$expiry))
+	chain <- reactive(getOneExpiration(chains(),input$expiry, input$allExpiration))
+
 	strikeData <- reactive(getStrikes(chain(),input$strikes, input$allStrikes))
     observe(updateSelectInput(session,"expiry",choices= expirations()))
      

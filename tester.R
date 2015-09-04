@@ -2,19 +2,19 @@ library(shiny)
 library(ggplot2)
 library(jsonlite)
 source("./openinterest/source/googleInput.R")
-ticker <- "GOOG"
-sym <- ticker
+ticker <- "AAPL"
+symbol <- ticker
 inputstrikes <- 20
 doDebug <<- T
 theSize <- 12
-
+allExpiration <- T
+options(error = recover)
 googChains <- getOptionChainGoogle(ticker)
 	chains <- mergePutsCalls(googChains)
-	chain <- getOneExpiration(chains)
+	chain <- getOneExpiration(chains,"", allExpiration)
 	strikes <- getStrikes(chain,inputstrikes)
 	expiry <- googChains[1,"expiry"]
 	selectInputChoices <- levels(as.factor(googChains[,"expiry"]))
-	chain <- getOneExpiration(googChains,expiry)
 		p <- ggplot(chain, aes(x = strike))
 
 		

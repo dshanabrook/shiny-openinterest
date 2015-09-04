@@ -2,6 +2,7 @@
 library(RCurl)
 library(jsonlite)
 library(plyr)
+
 getOptionChainGoogle = function(symbol, Exp="") {
   if (doDebug) print("getOptionChainGoogle")
   fixJSON = function(json){
@@ -12,18 +13,28 @@ getOptionChainGoogle = function(symbol, Exp="") {
 
   url = sprintf(URL1, symbol)
   chain = fromJSON(fixJSON(getURL(url)))
-  options = mlply(chain$expirations, function(y, m, d) {
-    url = sprintf(URL2, symbol, y, m, d)
-    expiry = fromJSON(fixJSON(getURL(url)))
-    expiry$calls$type = "Call"
-    expiry$puts$type  = "Put"
-
-    prices = rbind(expiry$calls, expiry$puts)
-    prices$expiry = sprintf("%4d-%02d-%02d", y, m, d)
-    prices$underlying.price = expiry$underlying_price
-    prices$retrieved = Sys.time()
-    prices
-  })
+  
+  options = tryCatch({
+  	mlply(chain$expirations, function(y, m, d) {
+	    url = sprintf(URL2, symbol, y, m, d)
+	    expiry = fromJSON(fixJSON(getURL(url)))
+	    expiry$calls$type = "Call"
+	    expiry$puts$type  = "Put"
+	
+	    prices = rbind(expiry$calls, expiry$puts)
+	    prices$expiry = sprintf("%4d-%02d-%02d", y, m, d)
+	    prices$underlying.price = expiry$underlying_price
+	    prices$retrieved = Sys.time()
+	    prices
+  		})
+  	},
+  	error= function(cond) {
+  		return(NULL)
+  		}
+  	)
+	
+	if (is.null(options)) 
+		return(NULL)
 
   options = options[sapply(options, class) == "data.frame"]
   options = cbind(data.frame(symbol), rbind.fill(options))
