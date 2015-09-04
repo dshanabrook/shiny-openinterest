@@ -59,6 +59,7 @@ shinyServer(function(input, output, clientData, session) {
      
 			
 output$OIplot <- renderPlot({
+withProgress(message="Now Plot the Data", value=10,{
 	if (doDebug) 
 		print("oiPlot")
 	p <- ggplot(chain(), aes(x = strike))
@@ -74,5 +75,6 @@ output$OIplot <- renderPlot({
 		size = theSize)) + theme(panel.grid.minor.y = element_blank(), panel.grid.major.y = element_blank()) + 
 		theme(legend.justification = c(1, 1), legend.position = c(1, 1)) + ylab("open interest")
 	return(p)
+	})	
 	})
 })
