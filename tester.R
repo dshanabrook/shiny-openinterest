@@ -8,7 +8,7 @@ inputstrikes <- 20
 doDebug <<- T
 theSize <- 12
 allExpiration <- T
-
+options(error = recover)
 googChains <- getOptionChainGoogle(ticker)
 	chains <- mergePutsCalls(googChains)
 	chain <- getOneExpiration(chains,"", allExpiration)
