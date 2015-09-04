@@ -1,12 +1,9 @@
-
 library(shiny)
-
 library(ggplot2)
-library(RCurl)
 library(jsonlite)
-library(plyr)
 source("./openinterest/source/googleInput.R")
 ticker <- "GOOG"
+symbol <- ticker
 inputstrikes <- 20
 doDebug <<- T
 theSize <- 12

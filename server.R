@@ -1,17 +1,13 @@
-#server
 library(shiny)
-#library(quantmod)
 library(ggplot2)
-library(RCurl)
 library(jsonlite)
-library(plyr)
 source("source/googleInput.R")
 doDebug <<- T
 theSize <- 12
 
 mergePutsCalls <- function(googChains) {
 	if (doDebug) 
-		print("stripGoogleChain")
+		print("mergePutsCalls")
 	optionMin <- subset(googChains, select = c(expiry, type, strike, 
 		open.interest))
 	puts <- subset(optionMin, type == "Put")
@@ -29,12 +25,7 @@ getOneExpiration <- function(chains, exp = "") {
 	print(exp)
 	return(chains[(chains$expiry == exp), ])
 }
-getGoodChain <- function(sym) {
-	googChains <- getOptionChainGoogle(sym)
-	chains <- stripGoogleChain(googChains)
-	chain <- getOneExpiration(chains)
-	return(chain)
-}
+
 getStrikes <- function(chain, strikesWanted, allStrikes=FALSE) {
 	if (doDebug)
 		print("getStrikes")
@@ -56,12 +47,15 @@ shinyServer(function(input, output, clientData, session) {
 	if (doDebug) 
 		print("update")
 	
-	googChains <- reactive({getOptionChainGoogle(input$ticker)})
-	expirations <- reactive({levels(as.factor(googChains()[,"expiry"]))})
-	chains <- reactive({mergePutsCalls(googChains())})
-	chain <- reactive({getOneExpiration(chains(),input$expiry)})
-	strikeData <- reactive({getStrikes(chain(),input$strikes, input$allStrikes)})
-    observe({updateSelectInput(session,"expiry",choices= expirations())})
+	googChains <- reactive(
+	withProgress(message="Getting data from Google", value=10,
+		getOptionChainGoogle(input$ticker)
+	))
+	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
+	chains <- reactive(mergePutsCalls(googChains()))
+	chain <- reactive(getOneExpiration(chains(),input$expiry))
+	strikeData <- reactive(getStrikes(chain(),input$strikes, input$allStrikes))
+    observe(updateSelectInput(session,"expiry",choices= expirations()))
      
 			
 output$OIplot <- renderPlot({
