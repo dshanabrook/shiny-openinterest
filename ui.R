@@ -1,10 +1,12 @@
 #ui
 maxStrikes <<- 40
-allExpiration <<- FALSE
+
 shinyUI(fluidPage(
 title="Open Interest Analysis",
 fluidRow(
-h3("Option Open Interest"),
+
+	h3("Option Open Interest", align="center"),
+	h4(textOutput("tickerText")),
     plotOutput("OIplot"),
 	column(4,
 	textInput("ticker","Ticker", value="AAPL")

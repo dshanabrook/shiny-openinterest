@@ -1,9 +1,16 @@
 library(shiny)
 library(ggplot2)
 library(jsonlite)
+library(quantmod)
 source("source/googleInput.R")
 doDebug <<- T
 theSize <- 12
+
+getAQuote <- function(sym){
+	if (doDebug) print("getLastQuote")
+	theQuote <- getQuote(sym)
+	return(theQuote$Last)
+}
 
 mergePutsCalls <- function(googChains) {
 	if (doDebug) 
@@ -59,14 +66,16 @@ shinyServer(function(input, output, clientData, session) {
 	chain <- reactive(getOneExpiration(chains(),input$expiry))
 	strikeData <- reactive(getStrikes(chain(),input$strikes, input$allStrikes))
     observe(updateSelectInput(session,"expiry",choices= expirations()))
-     
-			
+    quote <- reactive(getAQuote(input$ticker))
+
+output$tickerText <- renderText({paste("Last quote ",input$ticker,": $", quote(), sep="")})
+		
 output$OIplot <- renderPlot({
 withProgress(message="Now Plot the Data", value=10,{
 	if (doDebug) 
 		print("oiPlot")
 	p <- ggplot(chain(), aes(x = strike))
-		
+	p <- p + geom_vline(xintercept=quote(),show_guide=T, linetype=3)
 	p <- p + geom_area(aes(y = putOI, fill = "1 put", colour = "1 put", stat = "bin"), alpha = 0.5) + geom_area(aes(y = callOI, fill = "2 call", colour = "2 call", stat = "bin"), alpha = 0.5)
 	       
 	p <- p + geom_point(aes(y = callOI), size = 1.5, alpha = 0.5, color = "blue") + geom_point(aes(y=putOI), size = 1.5, alpha = 0.5, color = "red")
