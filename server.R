@@ -35,16 +35,26 @@ getOneExpiration <- function(chains, exp = "",allExpiration=FALSE) {
 		return(chains)}
 }
 
-getStrikes <- function(chain, strikesWanted, allStrikes=FALSE) {
+getStrikes <- function(chain, inputStrikes,  quote, allStrikes=FALSE, method="quote") {
 	if (doDebug)
 		print("getStrikes")
     
-	midIndex <- which.max(chain$callOI+chain$putOI)
-	lowerIndex <- midIndex - strikesWanted %/% 2
-	upperIndex <- midIndex + strikesWanted %/% 2
+    if ((method=="quote") & !allStrikes)
+    		midIndex <- which.min(abs(chain$strike-quote))
+    	else
+		midIndex <- which.max(chain$callOI+chain$putOI)
+	print(chain[midIndex,"strike"])
 	
-	if (lowerIndex < 1) lowerIndex <- 1
-	if ((upperIndex > nrow(chain))|allStrikes) upperIndex <- nrow(chain)
+	
+	if (allStrikes) {
+		lowerIndex <- 1
+		upperIndex <- nrow(chain)
+	} else {
+		lowerIndex <- midIndex - inputStrikes %/% 2
+		upperIndex <- midIndex + inputStrikes %/% 2
+		if (lowerIndex < 1) lowerIndex <- 1
+		if (upperIndex > nrow(chain)) upperIndex <- nrow(chain)
+		}
 	
 	lower <- chain[lowerIndex,"strike"]
 	upper <- chain[upperIndex,"strike"]
@@ -60,15 +70,16 @@ shinyServer(function(input, output, clientData, session) {
 	withProgress(message="Getting data from Google", value=10,
 		getOptionChainGoogle(input$ticker)
 	))
+	quote <- reactive(getAQuote(input$ticker))
 	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
 	chains <- reactive(mergePutsCalls(googChains()))
 #	chain <- reactive(getOneExpiration(chains(),input$expiry, input$allExpiration))
 	chain <- reactive(getOneExpiration(chains(),input$expiry))
-	strikeData <- reactive(getStrikes(chain(),input$strikes, input$allStrikes))
+	strikeData <- reactive(getStrikes(chain(),input$strikes, quote(), input$allStrikes))
     observe(updateSelectInput(session,"expiry",choices= expirations()))
-    quote <- reactive(getAQuote(input$ticker))
+    
 
-output$tickerText <- renderText({paste("Last quote ",input$ticker,": $", quote(), sep="")})
+output$tickerText <- renderText({paste("Last quote (delayed) ",input$ticker,": $", quote(), sep="")})
 		
 output$OIplot <- renderPlot({
 withProgress(message="Now Plot the Data", value=10,{
