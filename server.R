@@ -24,15 +24,17 @@ mergePutsCalls <- function(googChains) {
 	names(putCall) <- c("expiry", "strike", "putOI", "callOI")
 	return(putCall)
 }
-getOneExpiration <- function(chains, exp = "",allExpiration=FALSE) {
+getOneExpiration <- function(chains, exp = "",allExpiry=FALSE) {
 	if (doDebug) 
 		print("getOneExpiration")
 	if (exp=="")
 		exp <- chains[1, ]$expiry
-	if (!allExpiration){
+	if (!allExpiry){
 		return(chains[(chains$expiry == exp), ])
 	} else {
-		return(chains)}
+		allChains <- subset(chains, select=-expiry)
+		allChains <- aggregate(.~strike, data=allChains, sum)
+		return(allChains)}
 }
 
 getStrikes <- function(chain, inputStrikes,  quote, allStrikes=FALSE, method="quote") {
@@ -58,7 +60,8 @@ getStrikes <- function(chain, inputStrikes,  quote, allStrikes=FALSE, method="qu
 	
 	lower <- chain[lowerIndex,"strike"]
 	upper <- chain[upperIndex,"strike"]
-	range <- chain[lowerIndex:upperIndex,"strike"]
+	range <- round(chain[lowerIndex:upperIndex,"strike"])
+	print(range)
 	strikeData <- list(upper = upper, lower = lower, range = range)
 	return(strikeData)
 }
@@ -74,7 +77,7 @@ shinyServer(function(input, output, clientData, session) {
 	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
 	chains <- reactive(mergePutsCalls(googChains()))
 #	chain <- reactive(getOneExpiration(chains(),input$expiry, input$allExpiration))
-	chain <- reactive(getOneExpiration(chains(),input$expiry))
+	chain <- reactive(getOneExpiration(chains(),input$expiry,input$allExpiry))
 	strikeData <- reactive(getStrikes(chain(),input$strikes, quote(), input$allStrikes))
     observe(updateSelectInput(session,"expiry",choices= expirations()))
     
@@ -92,7 +95,7 @@ withProgress(message="Now Plot the Data", value=10,{
 	p <- p + geom_point(aes(y = callOI), size = 1.5, alpha = 0.5, color = "blue") + geom_point(aes(y=putOI), size = 1.5, alpha = 0.5, color = "red")
 	       
 	p <- p + scale_x_continuous(limits = c(strikeData()$lower, strikeData()$upper)
-	)#, breaks = strikeData()$range)
+	, breaks = strikeData()$range)
 	
 	#pretty(strikes()$lower:strikes()$upper, n = strikes()$strikesToPlot)))
 	p <- p + theme(legend.title = element_blank()) + theme(axis.text.x = element_text(angle = 90, 

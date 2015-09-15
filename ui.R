@@ -1,5 +1,5 @@
 #ui
-maxStrikes <<- 40
+maxStrikes <<- 48
 
 shinyUI(fluidPage(
 title="Open Interest Analysis",
@@ -13,6 +13,7 @@ fluidRow(
 	,submitButton(text = "Go", icon = NULL)
 	),
 	column(4,
+	checkboxInput("allExpiry", "Use all expirations?", value=F),
 	checkboxInput("allStrikes","Use all strikes?", value=F),
 #	checkboxInput("allExpiration","Aggregate all expirations?", value=F),
 	sliderInput("strikes","Strikes:", value=20, min=4, max=maxStrikes)),
