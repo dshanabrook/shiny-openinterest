@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(jsonlite)
 library(quantmod)
+library(scales)
 source("source/googleInput.R")
 doDebug <<- T
 theSize <- 12
@@ -80,7 +81,6 @@ shinyServer(function(input, output, clientData, session) {
 	chain <- reactive(getOneExpiration(chains(),input$expiry,input$allExpiry))
 	strikeData <- reactive(getStrikes(chain(),input$strikes, quote(), input$allStrikes))
     observe(updateSelectInput(session,"expiry",choices= expirations()))
-    
 
 output$tickerText <- renderText({paste("Last quote (delayed) ",input$ticker,": $", quote(), sep="")})
 		
@@ -95,7 +95,7 @@ withProgress(message="Now Plot the Data", value=10,{
 	p <- p + geom_point(aes(y = callOI), size = 1.5, alpha = 0.5, color = "blue") + geom_point(aes(y=putOI), size = 1.5, alpha = 0.5, color = "red")
 	       
 	p <- p + scale_x_continuous(limits = c(strikeData()$lower, strikeData()$upper)
-	, breaks = strikeData()$range)
+	, breaks = strikeData()$range) + scale_y_continuous(labels=comma) 
 	
 	#pretty(strikes()$lower:strikes()$upper, n = strikes()$strikesToPlot)))
 	p <- p + theme(legend.title = element_blank()) + theme(axis.text.x = element_text(angle = 90, 
