@@ -91,7 +91,8 @@ withProgress(message="Now Plot the Data", value=10,{
 	       
 	p <- p + geom_point(aes(y = callOI), size = 1.5, alpha = 0.5, color = "blue") + geom_point(aes(y=putOI), size = 1.5, alpha = 0.5, color = "red")
 	       
-	p <- p + scale_x_continuous(limits = c(strikeData()$lower, strikeData()$upper), breaks = strikeData()$range)
+	p <- p + scale_x_continuous(limits = c(strikeData()$lower, strikeData()$upper)
+	)#, breaks = strikeData()$range)
 	
 	#pretty(strikes()$lower:strikes()$upper, n = strikes()$strikesToPlot)))
 	p <- p + theme(legend.title = element_blank()) + theme(axis.text.x = element_text(angle = 90, 
