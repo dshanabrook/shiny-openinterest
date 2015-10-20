@@ -1,10 +1,11 @@
 library(shiny)
 library(ggplot2)
 library(jsonlite)
+library(quantmod)
 setwd("~/ShinyApps/openinterest/")
 
 source("source/googleInput.R")
-ticker <- "AAPL"
+ticker <- "RSX"
 symbol <- ticker
 inputStrikes <- 20
 doDebug <<- T

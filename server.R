@@ -1,10 +1,11 @@
+library(devtools)
 library(shiny)
 library(ggplot2)
 library(jsonlite)
 library(quantmod)
 library(scales)
 source("source/googleInput.R")
-doDebug <<- T
+doDebug <<- F
 theSize <- 12
 
 getAQuote <- function(sym){
