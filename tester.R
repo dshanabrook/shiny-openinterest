@@ -1,11 +1,10 @@
 library(shiny)
 library(ggplot2)
 library(jsonlite)
-library(quantmod)
 setwd("~/ShinyApps/openinterest/")
 
 source("source/googleInput.R")
-ticker <- "RSX"
+ticker <- "AAPL"
 symbol <- ticker
 inputStrikes <- 20
 doDebug <<- T
@@ -16,8 +15,11 @@ quote <- getAQuote(ticker)
 googChains <- getOptionChainGoogle(ticker)
 chains <- mergePutsCalls(googChains)
 expiry <- googChains[1, "expiry"]
-chain <- getOneExpiration(chains, expiry)
-strikes <- getStrikes(chain, inputstrikes, quote)
+chain1 <- getOneExpiration(chains, expiry)
+chain2 <- naToZero(chain1)
+strikeData <- getStrikes(chain, inputstrikes, quote)
+chain3 <- truncateChain(chain2, graphType, strikeData)
+chain <- useCummulative(chain3, strikeData)
 
 x <- aggregate(.~strike, data=y, sum)
 

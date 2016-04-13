@@ -1,5 +1,5 @@
 #ui
-maxStrikes <<- 48
+maxStrikes <<- 48 
 
 shinyUI(fluidPage(
 title="Open Interest Analysis",
@@ -20,5 +20,9 @@ fluidRow(
 	column(4,
 	 selectInput("expiry", "expiration yyyy-mm-dd",
                     multiple = FALSE,
-                    c("")))
+                    c("")),
+     selectInput("graphType", "Plot type:",list("Open Interest" = "prettyPlot", "Volume" = "OIvol","Call-Put OI difference" = "OIDiff","Cummulative OI"="cummulative", "Cummulative Diff"="cummDiff")),
+		checkboxInput("smoothOn", label = strong("Smooth strike interval?"),value = F),
+		br()
+)
 	)))

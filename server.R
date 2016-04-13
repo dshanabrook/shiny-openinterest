@@ -1,11 +1,10 @@
-library(devtools)
-library(shiny)
+library(shiny) 
 library(ggplot2)
 library(jsonlite)
 library(quantmod)
 library(scales)
 source("source/googleInput.R")
-doDebug <<- F
+doDebug <<- T
 theSize <- 12
 
 getAQuote <- function(sym){
@@ -39,17 +38,42 @@ getOneExpiration <- function(chains, exp = "",allExpiry=FALSE) {
 		return(allChains)}
 }
 
+useCummulative <- function(chain, strikeData, graphType="cummulative") {
+	if (doDebug) print("useCummulative")
+	if (graphType=="cummulative"){
+		print(chain)
+		chain <- truncateChain(chain, strikeData)
+		chain$callOI <- cumsum(chain$callOI)
+		chain$putOI <- rev(cumsum(rev(chain$putOI)))
+		print(chain)
+		if(nrow(chain)>0){
+		#	chain$putOI <- rev(chain$putOI)
+			#chain[nrow(chain):1, ]$putOI <- chain$putOI
+			#		print(chain$putOI)
+			#chain$cumDiff <- openInt$callOI - openInt$putOI
+			#chain$diff <- openInt$callOI - openInt$putOI
+			#chain$sum <- openInt$callOI + openInt$putOI
+	}
+		}
+	return(chain)
+}
+
+truncateChain <- function(chain, strikeData) {
+	if (doDebug) print("truncateChain")
+	chainx <- subset(chain, chain$strike>= strikeData$lower)
+	chainy <- subset(chainx, chainx$strike <= strikeData$upper)
+	return(chainy)
+
+}
+
 getStrikes <- function(chain, inputStrikes,  quote, allStrikes=FALSE, method="quote") {
-	if (doDebug)
-		print("getStrikes")
+	if (doDebug) print("getStrikes")
     
     if ((method=="quote") & !allStrikes)
     		midIndex <- which.min(abs(chain$strike-quote))
     	else
-		midIndex <- which.max(chain$callOI+chain$putOI)
-	print(chain[midIndex,"strike"])
-	
-	
+			midIndex <- which.max(chain$callOI+chain$putOI)
+	if (doDebug) print(chain[midIndex,"strike"])	
 	if (allStrikes) {
 		lowerIndex <- 1
 		upperIndex <- nrow(chain)
@@ -58,31 +82,35 @@ getStrikes <- function(chain, inputStrikes,  quote, allStrikes=FALSE, method="qu
 		upperIndex <- midIndex + inputStrikes %/% 2
 		if (lowerIndex < 1) lowerIndex <- 1
 		if (upperIndex > nrow(chain)) upperIndex <- nrow(chain)
-		}
-	
+		}	
 	lower <- chain[lowerIndex,"strike"]
 	upper <- chain[upperIndex,"strike"]
 	range <- round(chain[lowerIndex:upperIndex,"strike"])
-	print(range)
 	strikeData <- list(upper = upper, lower = lower, range = range)
+	if (doDebug) print(strikeData)
 	return(strikeData)
+}
+naToZero <- function(chain){
+	try(chain[is.na(chain$callOI),]$callOI <- 0, silent=T)
+	try(chain[is.na(chain$putOI),]$putOI <- 0, silent=T)
+	return(chain)
 }
 shinyServer(function(input, output, clientData, session) {
 	if (doDebug) 
 		print("update")
-	
 	googChains <- reactive(
-	withProgress(message="Getting data from Google", value=10,
-		getOptionChainGoogle(input$ticker)
-	))
+		withProgress(message="Getting data from Google", value=10,
+		getOptionChainGoogle(input$ticker)))
 	quote <- reactive(getAQuote(input$ticker))
 	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
 	chains <- reactive(mergePutsCalls(googChains()))
-#	chain <- reactive(getOneExpiration(chains(),input$expiry, input$allExpiration))
-	chain <- reactive(getOneExpiration(chains(),input$expiry,input$allExpiry))
-	strikeData <- reactive(getStrikes(chain(),input$strikes, quote(), input$allStrikes))
+	chain1 <- reactive(getOneExpiration(chains(),input$expiry,input$allExpiry))
+	chain2 <- reactive(naToZero(chain1()))
+	strikeData <- reactive(getStrikes(chain2(),input$strikes, quote(), input$allStrikes))
+	chain <- reactive(useCummulative(chain2(),strikeData(),input$graphType))
+	
     observe(updateSelectInput(session,"expiry",choices= expirations()))
-
+print("observer")
 output$tickerText <- renderText({paste("Last quote (delayed) ",input$ticker,": $", quote(), sep="")})
 		
 output$OIplot <- renderPlot({
