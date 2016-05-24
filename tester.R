@@ -3,26 +3,26 @@ library(ggplot2)
 library(jsonlite)
 setwd("~/ShinyApps/openinterest/")
 
-source("source/googleInput.R")
-ticker <- "AAPL"
-symbol <- ticker
-inputStrikes <- 20
+source("./source/googleInput.R")
+input_ticker <- "AAPL"
+input_strikes <- 20
 doDebug <<- T
 theSize <- 12
 allExpiration <- T
-#options(error = recover)
-quote <- getAQuote(ticker)
-googChains <- getOptionChainGoogle(ticker)
+input_allStrikes <- F
+
+googChains <- getOptionChainGoogle(input_ticker)
+input_expiry <- googChains[1, "expiry"]
+
+quote <- getAQuote(input_ticker)
+expirations <- levels(as.factor(googChains[,"expiry"]))
 chains <- mergePutsCalls(googChains)
-expiry <- googChains[1, "expiry"]
-chain1 <- getOneExpiration(chains, expiry)
+chain1 <- getOneExpiration(chains, input_expiry)
 chain2 <- naToZero(chain1)
-strikeData <- getStrikes(chain, inputstrikes, quote)
-chain3 <- truncateChain(chain2, graphType, strikeData)
-chain <- useCummulative(chain3, strikeData)
-
-x <- aggregate(.~strike, data=y, sum)
-
+strikeData <- getStrikes(chain2, input_strikes, quote, input_allStrikes)
+chain <- useCummulative(chain2, strikeData)
+#or
+chain <- chain2
 
 selectInputChoices <- levels(as.factor(googChains[, "expiry"]))
 p <- ggplot(chain, aes(x = strike))

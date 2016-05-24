@@ -21,8 +21,13 @@ fluidRow(
 	 selectInput("expiry", "expiration yyyy-mm-dd",
                     multiple = FALSE,
                     c("")),
-     selectInput("graphType", "Plot type:",list("Open Interest" = "prettyPlot", "Volume" = "OIvol","Call-Put OI difference" = "OIDiff","Cummulative OI"="cummulative", "Cummulative Diff"="cummDiff")),
-		checkboxInput("smoothOn", label = strong("Smooth strike interval?"),value = F),
+     selectInput("graphType", "Plot type:",list("Open Interest" = "prettyPlot" 		
+     #,"Volume" = "OIvol"
+     #,"Call-Put OI difference" = "OIDiff"
+     , "Cummulative OI"="cummulative"
+     #, "Cummulative Diff"="cummDiff"
+     )),
+		#checkboxInput("smoothOn", label = strong("Smooth strike interval?"),value = F),
 		br()
 )
 	)))
