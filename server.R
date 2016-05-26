@@ -4,7 +4,6 @@ library(quantmod)
 library(scales)
 source("./source/googleInput.R")
 doDebug <<- T
-theSize <- 12
 
 getAQuote <- function(sym){
 	if (doDebug) print("getLastQuote")
@@ -121,8 +120,8 @@ withProgress(message="Now Plot the Data", value=10,{
 	p <- ggplot(chain(), aes(x = strike))
 	p <- p + geom_vline(xintercept=quote(), linetype=3)
 
-	p <- p + geom_area(aes(y = putOI,  fill = " put",  stat = "bin"), alpha = 0.5)
-	p <- p + geom_area(aes(y = callOI, fill = "call",  stat = "bin"), alpha = 0.5)
+	p <- p + geom_area(aes(y = putOI,  fill = "1 put",  stat = "bin"), alpha = 0.5)
+	p <- p + geom_area(aes(y = callOI, fill = "2 call",  stat = "bin"), alpha = 0.5)
 	       
 	p <- p + geom_point(aes(y = callOI), size = 1.5, alpha = 0.5, color = "blue", na.rm=T)
 	p <- p + geom_point(aes(y = putOI),  size = 1.5, alpha = 0.5, color = "red", na.rm=T)
@@ -130,7 +129,7 @@ withProgress(message="Now Plot the Data", value=10,{
 	p <- p + scale_x_continuous(limits = c(strikeData()$lower, strikeData()$upper), breaks = strikeData()$range) + scale_y_continuous(labels=comma) 
 	
 	p <- p + theme(legend.title = element_blank())
-	p <- p + theme(axis.text.x = element_text(angle = 90, size = theSize))
+	p <- p + theme(axis.text.x = element_text(angle = 90, size = 12))
 	p <- p + theme(panel.grid.minor.y = element_blank(), panel.grid.major.y = element_blank())
 	p <- p + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 	p <- p + ylab("open interest")
