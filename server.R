@@ -52,9 +52,9 @@ truncateChain <- function(chain, strikeData) {
 
 }
 
-#change OI to cummulative OI below puts, above calls
-useCummulative <- function(chain, strikeData) {
-	if (doDebug) print("useCummulative")
+#change OI to cumulative OI below puts, above calls
+useCumulative <- function(chain, strikeData) {
+	if (doDebug) print("useCumulative")
 
 		chain <- truncateChain(chain, strikeData)
 		chain$callOI <- cumsum(chain$callOI)
@@ -103,8 +103,8 @@ shinyServer(function(input, output, clientData, session) {
 	chain2 <- reactive(naToZero(chain1()))
 	strikeData <- reactive(getStrikes(chain2(),input$strikes, quote()))
 	chain <- reactive({
-		if (input$graphType == "cummulative")
-			useCummulative(chain2(),strikeData())
+		if (input$graphType == "cumulative")
+			useCumulative(chain2(),strikeData())
 		else
 			chain2()
 			})

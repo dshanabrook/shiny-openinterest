@@ -16,7 +16,7 @@ fluidRow(
 	column(4,
 		selectInput("graphType", "Plot type:",list(
 			   "Open Interest" = "prettyPlot"
-		     , "Cummulative OI"= "cummulative"
+		     , "Cumulative OI"= "cumulative"
 		     #,"Volume" = "OIvol"
 		     #,"Call-Put OI difference" = "OIDiff"
 		     #, "Cummulative Diff"="cummDiff"
