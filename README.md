@@ -35,3 +35,4 @@ Then use these R commands:
     library(shinyapps)
     setwd("~/ShinyApps")
     runApp("openinterest")  
+![alt text](https://cloud.githubusercontent.com/assets/1490174/15562059/d368dfb0-22c9-11e6-854e-0686bbfd4ce9.png)
