@@ -66,20 +66,15 @@ useCummulative <- function(chain, strikeData) {
 
 
 #determine strike price range based on the # strikes requested
-getStrikes <- function(chain, inputStrikes, quote, allStrikes=FALSE) {
+getStrikes <- function(chain, inputStrikes, quote) {
 	if (doDebug) print("getStrikes")
 	
-	if (allStrikes) {
-		lowerIndex <- 1
-		upperIndex <- nrow(chain)
-	} else {
-		midIndex <- which.min(abs(chain$strike-quote))
-		lowerIndex <- midIndex - inputStrikes %/% 2
-		upperIndex <- midIndex + inputStrikes %/% 2
-		if (lowerIndex < 1) lowerIndex <- 1
-		if (upperIndex > nrow(chain)) upperIndex <- nrow(chain)
-		}
-			
+	midIndex <- which.min(abs(chain$strike-quote))
+	lowerIndex <- midIndex - inputStrikes %/% 2
+	upperIndex <- midIndex + inputStrikes %/% 2
+	if (lowerIndex < 1) lowerIndex <- 1
+	if (upperIndex > nrow(chain)) upperIndex <- nrow(chain)
+		
 	lower <- chain[lowerIndex,"strike"]
 	upper <- chain[upperIndex,"strike"]
 	range <- round(chain[lowerIndex:upperIndex,"strike"])
@@ -107,7 +102,7 @@ shinyServer(function(input, output, clientData, session) {
 	chains <- reactive(mergePutsCalls(googChains()))
 	chain1 <- reactive(getOneExpiration(chains(),input$expiry,input$allExpiry))
 	chain2 <- reactive(naToZero(chain1()))
-	strikeData <- reactive(getStrikes(chain2(),input$strikes, quote(), input$allStrikes))
+	strikeData <- reactive(getStrikes(chain2(),input$strikes, quote()))
 	chain <- reactive({
 		if (input$graphType == "cummulative")
 			useCummulative(chain2(),strikeData())
