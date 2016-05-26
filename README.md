@@ -28,11 +28,10 @@ Executing
 =========
 Run on my shinyio server: https://bravo.shinyapps.io/openinterest/
 
-Run locally by installing R code and packages.  
-Then use these R commands:
-
+To run locally install R, then:
+    
+    install.packages(c("shiny", "ggplot2", "quantmod", "scales"), repos="http://cran.rstudio.com/")
     library(shiny)
-    library(shinyapps)
-    setwd("~/ShinyApps")
-    runApp("openinterest")  
+    runGitHub("shiny-openinterest", "dshanabrook")library(shiny) 
+    
 ![alt text](https://cloud.githubusercontent.com/assets/1490174/15562059/d368dfb0-22c9-11e6-854e-0686bbfd4ce9.png)
