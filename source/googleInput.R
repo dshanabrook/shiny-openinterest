@@ -43,6 +43,6 @@ getOptionChainGoogle = function(symbol, Exp="") {
     options[, col] = suppressWarnings(as.numeric(options[, col]))
   options[, "open.interest"] = suppressWarnings(as.integer(options[, "open.interest"]))
   col.order = c("symbol", "type", "expiry", "strike", "premium",
-                "bid", "ask", "open.interest", "retrieved")
+                "bid", "ask", "open.interest", "retrieved", "underlying.price")
   options[, col.order]
 }

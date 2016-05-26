@@ -5,12 +5,6 @@ library(scales)
 source("./source/googleInput.R")
 doDebug <<- T
 
-getAQuote <- function(sym){
-	if (doDebug) print("getLastQuote")
-	theQuote <- getQuote(sym)
-	return(theQuote$Last)
-}
-
 #removes unused chain fields
 #merges puts and calls 
 #fields: expiry, strike, putOI, callOI
@@ -95,7 +89,7 @@ shinyServer(function(input, output, clientData, session) {
 	googChains <- reactive(withProgress(message="Getting data from Google", value=10,
 		getOptionChainGoogle(input$ticker)))
 			
-	quote <- reactive(getAQuote(input$ticker))
+	quote <- reactive(round(googChains()[1,"underlying.price"], digits=3))
 	expirations <- reactive(levels(as.factor(googChains()[,"expiry"])))
 	
 	chains <- reactive(mergePutsCalls(googChains()))
@@ -111,7 +105,7 @@ shinyServer(function(input, output, clientData, session) {
     observe(
    		updateSelectInput(session,"expiry",choices= expirations()))
    		
-	output$tickerText <- renderText({paste("Last quote (delayed) ",input$ticker,": $", quote(), sep="")})
+	output$tickerText <- renderText({paste("Last quote ",input$ticker,": $", quote(), sep="")})
 		
 output$OIplot <- renderPlot({
 withProgress(message="Now Plot the Data", value=10,{
