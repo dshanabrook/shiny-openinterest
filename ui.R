@@ -14,7 +14,7 @@ fluidRow(
 	),
 	column(4,
 	checkboxInput("allExpiry", "Use all expirations?", value=F),
-	checkboxInput("allStrikes","Use all strikes?", value=F),
+#	checkboxInput("allStrikes","Use all strikes?", value=F),
 #	checkboxInput("allExpiration","Aggregate all expirations?", value=F),
 	sliderInput("strikes","Strikes:", value=20, min=4, max=maxStrikes)),
 	column(4,
