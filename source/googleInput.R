@@ -5,14 +5,18 @@ library(plyr)
 
 getOptionChainGoogle = function(symbol, Exp="") {
   if (doDebug) print("getOptionChainGoogle")
+  
   fixJSON = function(json){
     gsub('([^,{:]+):', '"\\1":', json)
   }
+  
   URL1 = 'http://www.google.com/finance/option_chain?q=%s&output=json'
   URL2 = paste0(URL1, '&expy=%d&expm=%d&expd=%d')
-
   url = sprintf(URL1, symbol)
-  chain = fromJSON(fixJSON(getURL(url)))
+  
+  chain = tryCatch({
+  	fromJSON(fixJSON(getURL(url)))},
+  	error = function(cond) {return(NULL)})
   
   options = tryCatch({
   	mlply(chain$expirations, function(y, m, d) {
@@ -44,5 +48,6 @@ getOptionChainGoogle = function(symbol, Exp="") {
   options[, "open.interest"] = suppressWarnings(as.integer(options[, "open.interest"]))
   col.order = c("symbol", "type", "expiry", "strike", "premium",
                 "bid", "ask", "open.interest", "retrieved", "underlying.price")
-  options[, col.order]
+ 	chain <- options[, col.order]
+ 	return(chain)
 }

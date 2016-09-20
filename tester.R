@@ -1,11 +1,20 @@
+rm(list = ls())
 library(shiny)
 library(ggplot2)
-library(jsonlite)
+library(quantmod)
+library(scales)
+#library(jsonlite)
 setwd("~/ShinyApps/openinterest/")
 
 source("./source/googleInput.R")
+source("./source/functions.R")
+
 input_ticker <- "AAPL"
+#input_ticker <- "NASDAQ:QQQ"
+#input_ticker <- "bad"
+symbol <- input_ticker
 input_strikes <- 20
+input_expiry <- ""
 doDebug <<- T
 theSize <- 12
 allExpiration <- T
@@ -14,12 +23,16 @@ input_allStrikes <- F
 googChains <- getOptionChainGoogle(input_ticker)
 input_expiry <- googChains[1, "expiry"]
 
-quote <- getAQuote(input_ticker)
+quote <- getGoogleQuote(googChains)
 expirations <- levels(as.factor(googChains[,"expiry"]))
 chains <- mergePutsCalls(googChains)
 chain1 <- getOneExpiration(chains, input_expiry)
 chain2 <- naToZero(chain1)
-strikeData <- getStrikes(chain2, input_strikes, quote, input_allStrikes)
+strikeData <- getStrikes(chain2, input_strikes, quote)
+
+
+
+
 chain <- useCummulative(chain2, strikeData)
 #or
 chain <- chain2

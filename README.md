@@ -1,4 +1,4 @@
-openinterest:
+topeninterest:
 ===========
 Graphing Stock Option Open Interest
 ===========
@@ -29,9 +29,9 @@ Executing
 Run on my shinyio server: https://bravo.shinyapps.io/openinterest/
 
 To run locally install R, then:
-    
+
     install.packages(c("shiny", "ggplot2", "quantmod", "scales"), repos="http://cran.rstudio.com/")
     library(shiny)
-    runGitHub("shiny-openinterest", "dshanabrook") 
-    
+    runGitHub("shiny-openinterest", "dshanabrook")
+
 ![alt text](https://cloud.githubusercontent.com/assets/1490174/15562059/d368dfb0-22c9-11e6-854e-0686bbfd4ce9.png)
